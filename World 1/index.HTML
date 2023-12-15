@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World 1</title>
+    <style>
+         body {
+            background-image: url("https://images.squarespace-cdn.com/content/v1/551a19f8e4b0e8322a93850a/1566852559261-T73HBDFMAXQT6YCZ2XYF/Grass_Sample.png") ;
+overflow: hidden;
+}
+canvas {
+
+    width: 100vw;
+    height: 100vh;
+  background-image: url('https://images.squarespace-cdn.com/content/v1/551a19f8e4b0e8322a93850a/1566852559261-T73HBDFMAXQT6YCZ2XYF/Grass_Sample.png');
+}
+
+
+    </style>
+</head>
+<div class="canvas-container">
+    <canvas id='my-canvas' width="900" height="600"></canvas>
+  </div>
+  
+<body>
+    <script>
+        const canvas = document.getElementById('my-canvas');
+const ctx = canvas.getContext('2d');
+const CYCLE_LOOP = [0, 1, 0, 2];
+const FACING_DOWN = 0;
+const FACING_UP = 1;
+const FACING_LEFT = 2;
+const FACING_RIGHT = 3;
+const SCALE = 2;
+const WIDTH = 16;
+const HEIGHT = 18;
+const SCALED_WIDTH = SCALE * WIDTH;
+const SCALED_HEIGHT = SCALE * HEIGHT;
+const MOVEMENT_SPEED = 3;
+const FRAME_LIMIT = 12;
+
+
+  
+let Hero = new Image();
+let enemy = new Image();
+let currentLoopIndex = 0;
+let frameCount = 0;
+let currentDirection = FACING_DOWN;
+let keyPresses = {};
+let positionX = 500;
+let positionY = 250;
+
+window.addEventListener('keydown', keyDownListener);
+function keyDownListener(event) {
+  keyPresses[event.key] = true;
+}
+
+window.addEventListener('keyup', keyUpListener);
+function keyUpListener(event) {
+  keyPresses[event.key] = false;
+}
+
+function loadImage() {
+  Hero.src = 'https://opengameart.org/sites/default/files/Green-Cap-Character-16x18.png';
+  Hero.onload = function() {
+    window.requestAnimationFrame(gameLoop);
+  };
+}
+
+function drawFrame(frameX, frameY, canvasX, canvasY) {
+  ctx.drawImage(img,
+                frameX * WIDTH, frameY * HEIGHT, WIDTH, HEIGHT,
+                canvasX, canvasY, SCALED_WIDTH, SCALED_HEIGHT);
+}
+
+loadImage();
+
+
+
+function drawFrame(frameX, frameY, canvasX, canvasY) {
+  ctx.drawImage(Hero,
+                frameX * WIDTH, frameY * HEIGHT, WIDTH, HEIGHT,
+                canvasX, canvasY, SCALED_WIDTH, SCALED_HEIGHT);
+}
+
+loadImage();
+
+function gameLoop() {
+ ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  let hasMoved = false;
+  
+   if (keyPresses.w) {
+    moveCharacter(0, -MOVEMENT_SPEED, FACING_UP);
+    hasMoved = true;
+  } else if (keyPresses.s) {
+    moveCharacter(0, MOVEMENT_SPEED, FACING_DOWN);
+    hasMoved = true;
+  }
+
+  if (keyPresses.a) {
+    moveCharacter(-MOVEMENT_SPEED, 0, FACING_LEFT);
+    hasMoved = true;
+  } else if (keyPresses.d) {
+    moveCharacter(MOVEMENT_SPEED, 0, FACING_RIGHT);
+    hasMoved = true;
+  }
+
+  if (hasMoved) {
+    frameCount++;
+    if (frameCount >= FRAME_LIMIT) {
+      frameCount = 0;
+      currentLoopIndex++;
+      if (currentLoopIndex >= CYCLE_LOOP.length) {
+        currentLoopIndex = 0;
+      }
+    }
+  }
+  
+   if (!hasMoved) {
+    currentLoopIndex = 0;
+   }
+  drawFrame(CYCLE_LOOP[currentLoopIndex], currentDirection, positionX, positionY);
+  window.requestAnimationFrame(gameLoop);
+}
+
+function moveCharacter(deltaX, deltaY, direction) {
+  if (positionX + deltaX > 0 && positionX + SCALED_WIDTH + deltaX < canvas.width) {
+    positionX += deltaX;
+  }
+  if (positionY + deltaY > 0 && positionY + SCALED_HEIGHT + deltaY < canvas.height) {
+    positionY += deltaY;
+  }
+  currentDirection = direction;
+}
+
+ 
+
+
+    </script>
+</body>
+</html>
